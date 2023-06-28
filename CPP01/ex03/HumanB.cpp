@@ -6,7 +6,7 @@
 /*   By: kkaiyawo <kkaiyawo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/27 12:24:34 by kkaiyawo          #+#    #+#             */
-/*   Updated: 2023/06/27 12:35:03 by kkaiyawo         ###   ########.fr       */
+/*   Updated: 2023/06/28 11:16:58 by kkaiyawo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ HumanB::HumanB(std::string name) : _name(name)
 
 HumanB::~HumanB()
 {
+	std::cout << this->_name << " is dead" << std::endl;
 	return ;
 }
 void	HumanB::attack()
