@@ -6,7 +6,7 @@
 /*   By: kkaiyawo <kkaiyawo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/27 11:13:26 by kkaiyawo          #+#    #+#             */
-/*   Updated: 2023/06/27 11:13:33 by kkaiyawo         ###   ########.fr       */
+/*   Updated: 2023/06/28 10:59:09 by kkaiyawo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@ int	main(void)
 {
 	Zombie *zombie;
 
-	zombie = newZombie("Kwame");
+	zombie = newZombie("Armel");
 	zombie->announce();
-	randomChump("Kofi");
+	randomChump("Not Armel");
 	delete zombie;
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: kkaiyawo <kkaiyawo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/27 13:04:59 by kkaiyawo          #+#    #+#             */
-/*   Updated: 2023/06/27 13:49:39 by kkaiyawo         ###   ########.fr       */
+/*   Updated: 2023/06/28 11:03:26 by kkaiyawo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,8 @@ int	ft_sed(std::string filename, std::string s1, std::string s2)
 	{
 		int cutPos = str.find(s1);
 		std::string tmp = str.substr(0, cutPos);
-		tmp.append(s2);
-		tmp.append(str.substr(cutPos + s1.length()));
+		tmp += s2;
+		tmp += str.substr(cutPos + s1.length());
 		str = tmp;
 	}
 

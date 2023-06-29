@@ -6,16 +6,16 @@
 #    By: kkaiyawo <kkaiyawo@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/26 19:32:50 by kkaiyawo          #+#    #+#              #
-#    Updated: 2023/06/29 10:02:17 by kkaiyawo         ###   ########.fr        #
+#    Updated: 2023/06/29 10:02:49 by kkaiyawo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
  ### EXECUTABLE ###
-NAME			=	Fixed00
+NAME			=	Fixed03
 
 ### FILES ###
-SRC_FILE		=	main.cpp Fixed.cpp
-HEADER_FILE		=	Fixed.hpp
+SRC_FILE		=	main.cpp Fixed.cpp Point.cpp bsp.cpp
+HEADER_FILE		=	Fixed.hpp Point.hpp
 
 ### PATH ###
 SRC				=	${addprefix ${BUILD_DIR},${SRC_FILE}}
@@ -44,7 +44,4 @@ fclean:			clean
 
 re:				fclean all
 
-test:			re
-					./${NAME}
-
-.PHONY:			all library clean fclean re
+PHONY:			all library clean fclean re
