@@ -6,7 +6,7 @@
 /*   By: kkaiyawo <kkaiyawo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/29 16:14:03 by kkaiyawo          #+#    #+#             */
-/*   Updated: 2023/06/29 16:55:19 by kkaiyawo         ###   ########.fr       */
+/*   Updated: 2023/07/13 11:09:54 by kkaiyawo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,9 @@ Animal::~Animal() {
 }
 
 Animal::Animal(Animal const &animal) {
-	std::cout << "Animal copy constructor called" << std::endl;
 	*this = animal;
+	// this->makeSound() = animal.makeSound();
+	std::cout << "Animal copy constructor called" << std::endl;
 }
 
 Animal& Animal::operator=(Animal const &animal) {

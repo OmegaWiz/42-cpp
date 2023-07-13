@@ -6,7 +6,7 @@
 /*   By: kkaiyawo <kkaiyawo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/29 16:43:56 by kkaiyawo          #+#    #+#             */
-/*   Updated: 2023/06/29 17:34:51 by kkaiyawo         ###   ########.fr       */
+/*   Updated: 2023/07/13 11:11:35 by kkaiyawo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,20 @@ int main()
 	delete meta;
 	delete j;
 	delete i;
+	std::cout << "------------------------------------------------------" << std::endl;
+	const Animal* cat1 = new Cat();
+	cat1->makeSound();
+	const Animal cat2(*cat1);
+	cat2.makeSound();
+	delete cat1;
+	cat2.makeSound();
+	std::cout << "------------------------------------------------------" << std::endl;
+	const Cat* cat3 = new Cat();
+	cat3->makeSound();
+	const Cat cat4(*cat3);
+	cat4.makeSound();
+	delete cat3;
+	cat4.makeSound();
 	std::cout << "------------------------------------------------------" << std::endl;
 	const WrongAnimal* Armel = new WrongAnimal();
 	const WrongCat* Milya = new WrongCat();
