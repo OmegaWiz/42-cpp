@@ -6,7 +6,7 @@
 #    By: kkaiyawo <kkaiyawo@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/26 19:32:50 by kkaiyawo          #+#    #+#              #
-#    Updated: 2023/07/13 09:41:42 by kkaiyawo         ###   ########.fr        #
+#    Updated: 2023/08/02 07:41:18 by kkaiyawo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -45,5 +45,8 @@ fclean:			clean
 					${RM} ${NAME}
 
 re:				fclean all
+
+test:			all
+					./${NAME}
 
 PHONY:			all library clean fclean re
