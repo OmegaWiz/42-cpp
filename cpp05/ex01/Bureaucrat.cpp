@@ -6,7 +6,7 @@
 /*   By: kkaiyawo <kkaiyawo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 19:39:52 by kkaiyawo          #+#    #+#             */
-/*   Updated: 2023/09/02 15:48:46 by kkaiyawo         ###   ########.fr       */
+/*   Updated: 2023/09/02 16:14:18 by kkaiyawo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ Bureaucrat::Bureaucrat(Bureaucrat const &other) : _name(other._name), _grade(oth
 
 Bureaucrat &Bureaucrat::operator=(Bureaucrat const &other) {
 	if (this != &other) {
-		_grade = other.getGrade();
+		_grade = other._grade;
 	}
 	return (*this);
 }
@@ -82,6 +82,22 @@ void Bureaucrat::decrementGrade() {
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
+	}
+}
+
+void Bureaucrat::signForm(Form &form) {
+	try
+	{
+		if (form.getGradeToSign() < _grade) {
+			throw Form::GradeTooLowException();
+		} else {
+			form.beSigned(*this);
+			std::cout << _name << " signed " << form.getName() << std::endl;
+		}
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << _name << " couldn't sign " << form.getName() << " because " << e.what() << std::endl;
 	}
 }
 

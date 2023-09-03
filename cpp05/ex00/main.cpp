@@ -6,7 +6,7 @@
 /*   By: kkaiyawo <kkaiyawo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/29 16:43:56 by kkaiyawo          #+#    #+#             */
-/*   Updated: 2023/08/02 20:14:15 by kkaiyawo         ###   ########.fr       */
+/*   Updated: 2023/09/02 15:02:49 by kkaiyawo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ int main()
 	Bureaucrat b5 = *b4;
 	delete b4;
 	std::cout << b5;
+	Bureaucrat b12 = b5;
+	std::cout << b12;
 
 	std::cout << "----------Constructor with parameters----------" << std::endl;
 	Bureaucrat b6("Milya", 10);
