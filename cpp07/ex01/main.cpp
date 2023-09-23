@@ -6,7 +6,7 @@
 /*   By: kkaiyawo <kkaiyawo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/18 04:44:37 by kkaiyawo          #+#    #+#             */
-/*   Updated: 2023/09/18 04:48:34 by kkaiyawo         ###   ########.fr       */
+/*   Updated: 2023/09/23 12:17:53 by kkaiyawo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void div(int &x)
 int main()
 {
 	int arr[] = {1, 2, 3, 4, 5};
-	std::cout << "Original array: ";
+	std::cout << "First array: ";
 	::iter(arr, 5, print);
 	std::cout << std::endl;
 
