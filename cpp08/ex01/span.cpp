@@ -6,12 +6,11 @@
 /*   By: kkaiyawo <kkaiyawo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/09 14:38:58 by kkaiyawo          #+#    #+#             */
-/*   Updated: 2023/10/15 13:06:48 by kkaiyawo         ###   ########.fr       */
+/*   Updated: 2023/10/15 14:04:43 by kkaiyawo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "span.hpp"
-#include <iterators>
 
 Span::Span(unsigned int n) : _n(n) {
 }
@@ -33,13 +32,13 @@ Span &Span::operator=(Span const &rhs) {
 
 void Span::addNumber(int n) {
 	if (this->_v.size() == this->_n)
-		throw Span::FullException();
+		throw Span::ContainerFullException();
 	this->_v.push_back(n);
 }
 
 void Span::addNumber(std::vector<int>::iterator begin, std::vector<int>::iterator end) {
-	if (this->_v.size() + ((end - begin) / sizeof(int)) > this->_n)
-		throw Span::FullException();
+	if (this->_v.size() + (end - begin) > this->_n)
+		throw Span::ContainerFullException();
 	this->_v.insert(this->_v.end(), begin, end);
 }
 
@@ -48,12 +47,11 @@ int Span::shortestSpan(void) {
 		throw Span::NoSpanException();
 	std::vector<int> v = this->_v;
 	std::sort(v.begin(), v.end());
-	int min = v[1] - v[0];
-	for (std::vector<int>::iterator it = v.begin(); it != v.end() - 1; it++) {
-		if (*(it + 1) - *it < min)
-			min = *(it + 1) - *it;
+	int mn = v[1] - v[0];
+	for (int i = 1; i < (int) v.size() - 1; i++) {
+		mn = std::min(mn, v[i + 1] - v[i]);
 	}
-	return min;
+	return mn;
 }
 
 int Span::longestSpan(void) {
@@ -64,7 +62,7 @@ int Span::longestSpan(void) {
 	return v[v.size() - 1] - v[0];
 }
 
-const char *Span::FullException::what() const throw() {
+const char *Span::ContainerFullException::what() const throw() {
 	return "Container is full";
 }
 
