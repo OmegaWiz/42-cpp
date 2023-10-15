@@ -6,7 +6,7 @@
 /*   By: kkaiyawo <kkaiyawo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/15 13:10:59 by kkaiyawo          #+#    #+#             */
-/*   Updated: 2023/10/15 14:07:08 by kkaiyawo         ###   ########.fr       */
+/*   Updated: 2023/10/15 14:48:02 by kkaiyawo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ int main()
 	std::vector<int> v;
 	v.push_back(100);
 	v.push_back(-100);
+
 	Span sp = Span(10);
 
 	sp.addNumber(6);
@@ -24,11 +25,14 @@ int main()
 	sp.addNumber(17);
 	sp.addNumber(9);
 	sp.addNumber(11);
+	std::cout << "shortest span: " << sp.shortestSpan() << std::endl;
+	std::cout << "longest span : " << sp.longestSpan() << std::endl;
 
 	sp.addNumber(v.begin(), v.end());
 
-	std::cout << sp.shortestSpan() << std::endl;
-	std::cout << sp.longestSpan() << std::endl;
+	std::cout << "after adding 100 and -100\n";
+	std::cout << "shortest span: " << sp.shortestSpan() << std::endl;
+	std::cout << "longest span : " << sp.longestSpan() << std::endl;
 
 	return 0;
 }

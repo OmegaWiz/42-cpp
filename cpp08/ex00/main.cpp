@@ -6,7 +6,7 @@
 /*   By: kkaiyawo <kkaiyawo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/24 10:58:53 by kkaiyawo          #+#    #+#             */
-/*   Updated: 2023/10/15 08:46:39 by kkaiyawo         ###   ########.fr       */
+/*   Updated: 2023/10/15 14:43:24 by kkaiyawo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,60 +17,42 @@
 
 
 int main(void) {
-	std::string s;
-	std::cout << "Select a container: vector, list, deque" << std::endl;
-	std::cin >> s;
-	if (s == "vector") {
-		std::vector<int> v;
-		for (int i = 0; i < 10; i++)
-			v.push_back(i);
-		std::cout << "Vector: ";
-		for (std::vector<int>::iterator it = v.begin(); it != v.end(); it++)
-			std::cout << *it << " ";
-		std::cout << std::endl;
-		std::cout << "Enter a number to find: ";
-		int n;
-		std::cin >> n;
-		std::vector<int>::iterator it = easyfind(v, n);
-		if (it != v.end())
-			std::cout << "Found " << n << " at index " << it - v.begin() << std::endl;
-		else
-			std::cout << "Not found" << std::endl;
-	}
-	else if (s == "list") {
-		std::list<int> l;
-		for (int i = 0; i < 10; i++)
-			l.push_back(i);
-		std::cout << "List: ";
-		for (std::list<int>::iterator it = l.begin(); it != l.end(); it++)
-			std::cout << *it << " ";
-		std::cout << std::endl;
-		std::cout << "Enter a number to find: ";
-		int n;
-		std::cin >> n;
-		std::list<int>::iterator it = easyfind(l, n);
-		if (it != l.end())
-			std::cout << "Found " << n << std::endl;
-		else
-			std::cout << "Not found" << std::endl;
-	}
-	else if (s == "deque") {
-		std::deque<int> d;
-		for (int i = 0; i < 10; i++)
-			d.push_back(i);
-		std::cout << "Deque: ";
-		for (std::deque<int>::iterator it = d.begin(); it != d.end(); it++)
-			std::cout << *it << " ";
-		std::cout << std::endl;
-		std::cout << "Enter a number to find: ";
-		int n;
-		std::cin >> n;
-		std::deque<int>::iterator it = easyfind(d, n);
-		if (it != d.end())
-			std::cout << "Found " << n << " at index " << it - d.begin() << std::endl;
-		else
-			std::cout << "Not found" << std::endl;
-	}
-	else
-		std::cout << "Invalid container" << std::endl;
+	std::vector<int> v;
+	v.push_back(100);
+	v.push_back(-100);
+	v.push_back(0);
+	v.push_back(42);
+	v.push_back(21);
+	std::cout << "vector: ";
+	for (int i = 0; i < (int) v.size(); i++)
+		std::cout << v[i] << " ";
+	std::cout << std::endl;
+	std::cout << "easyfind(v, 42): " << easyfind(v, 42) - v.begin() << std::endl << std::endl;
+
+	std::list<int> l;
+	l.push_back(100);
+	l.push_back(-100);
+	l.push_back(0);
+	l.push_back(42);
+	l.push_back(21);
+	std::cout << "list: ";
+	for (std::list<int>::iterator it = l.begin(); it != l.end(); it++)
+		std::cout << *it << " ";
+	std::cout << std::endl;
+	std::cout << "easyfind(l, -100): " << (easyfind(l, -100) != l.end()) << std::endl << std::endl;
+
+	std::deque<int> d;
+	d.push_back(100);
+	d.push_back(-100);
+	d.push_back(0);
+	d.push_back(42);
+	d.push_back(21);
+	std::cout << "deque: ";
+	for (std::deque<int>::iterator it = d.begin(); it != d.end(); it++)
+		std::cout << *it << " ";
+	std::cout << std::endl;
+	std::cout << "easyfind(d, 100): " << easyfind(d, 100) - d.begin() << std::endl << std::endl;
+
+	std::cout << "easyfind(d, 1000): " << (easyfind(d, 1000) != d.end() ? "True" : "False") << std::endl << std::endl;
+
 }
