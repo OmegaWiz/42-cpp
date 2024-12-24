@@ -1,31 +1,35 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   BitcoinExchange.hpp                                :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: kkaiyawo <kkaiyawo@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/21 13:02:36 by kkaiyawo          #+#    #+#             */
-/*   Updated: 2023/10/21 13:35:47 by kkaiyawo         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#pragma once
 
-#ifndef BITCOINEXCHANGE_HPP
-# define BITCOINEXCHANGE_HPP
+#include <map>
+#include <string>
+#include <fstream>
+#include <iostream>
 
-# include <iostream>
-# include <fstream>
+#define ld long double
+#define BAD_INPUT_ERR -1
+#define BAD_DATE_ERR -2
+#define LESS_THAN_ZERO_ERR -3
+#define OVERFLOW_ERR -4
+#define LESS_THAN 0
+#define EQUAL 1
+#define GREATER_THAN 2
 
-class BitcoinExchange
-{
+class BitcoinExchange {
 	public:
-		BitcoinExchange(std::string const &file);
+		BitcoinExchange(std::string const dbfile="data.csv");
 		~BitcoinExchange();
-	private:
-		BitcoinExchange();
-		BitcoinExchange(BitcoinExchange const &other);
-		BitcoinExchange &operator=(BitcoinExchange const &other);
-		std::string _file;
-};
+		BitcoinExchange(BitcoinExchange const &src);
+		BitcoinExchange &operator=(BitcoinExchange const &rhs);
 
-#endif
+		void parse(std::string const infile);
+	private:
+		std::map<std::string, ld> m_db;
+
+		BitcoinExchange();
+		int _lineParser(std::string const line, std::string &date, std::string &value, const char *cmp);
+		int _dateChecker(std::string const date);
+		int _dateComparator(std::string const date1, std::string const date2);
+		ld _valueParser(std::string const value);
+		void _printError(int err=0);
+		int _strToInt(std::string const str);
+};

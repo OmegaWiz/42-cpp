@@ -1,6 +1,6 @@
 #  |  |  ___ \    \  |         |
-#  |  |     ) |  |\/ |   _  |  |  /   _ 
-# ___ __|  __/   |   |  (   |    <    __/ 
+#  |  |     ) |  |\/ |   _  |  |  /   _
+# ___ __|  __/   |   |  (   |    <    __/
 #    _|  _____| _|  _| \__,_| _|\_\ \___|
 #                              by jcluzet
 ################################################################################
@@ -8,20 +8,25 @@
 ################################################################################
 
 NAME        := btc
-CC         := c++
-FLAGS    := -Wall -Wextra -Werror -std=c++98
- 
+CXX         	:= c++
+# SANITIZE	:= -fsanitize=address
+GDB			:= -g
+WARNING		:= -Wall -Wextra -Werror
+CFLAGS    	:= $(WARNING) -std=c++98 $(GDB) $(SANITIZE)
+INC_DIR    	:= $(shell find . -type d)
+
 ################################################################################
 #                                 PROGRAM'S SRCS                               #
 ################################################################################
 
-SRCS        :=      BitcoinExchange.cpp \
-                          main.cpp \
-                          
+DEPS		:= $(shell find . -name "*.hpp")
+SRCS		:= $(shell find . -name "*.cpp")
+
+
 OBJS        := ${SRCS:.cpp=.o}
 
 .cpp.o:
-	${CC} ${FLAGS} -c $< -o ${<:.cpp=.o}
+	${CXX} ${CFLAGS} $(addprefix -I, $(INC_DIR)) -c $< -o ${<:.cpp=.o}
 
 ################################################################################
 #                                  Makefile  objs                              #
@@ -38,10 +43,13 @@ RM		    := rm -f
 
 ${NAME}:	${OBJS}
 			@echo "$(GREEN)Compilation ${CLR_RMV}of ${YELLOW}$(NAME) ${CLR_RMV}..."
-			${CC} ${FLAGS} -o ${NAME} ${OBJS}
+			${CXX} ${CFLAGS} -o ${NAME} ${OBJS}
 			@echo "$(GREEN)$(NAME) created[0m ✔️"
 
+
 all:		${NAME}
+
+${OBJS}:	${DEPS}
 
 bonus:		all
 
@@ -53,8 +61,13 @@ fclean:		clean
 			@ ${RM} ${NAME}
 			@ echo "$(RED)Deleting $(CYAN)$(NAME) $(CLR_RMV)binary ✔️"
 
+# TODO remove me :D
+faster_way_compilation:   fclean
+			@make -j 4 all
+
 re:			fclean all
 
+test:		all
+			@./${NAME}
+
 .PHONY:		all clean fclean re
-
-
