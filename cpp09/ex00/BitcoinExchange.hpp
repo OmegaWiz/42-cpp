@@ -13,6 +13,9 @@
 #define LESS_THAN 0
 #define EQUAL 1
 #define GREATER_THAN 2
+#ifndef INT_MAX
+# define INT_MAX 2147483647
+#endif
 
 class BitcoinExchange {
 	public:

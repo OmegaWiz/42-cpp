@@ -10,7 +10,8 @@ BitcoinExchange::BitcoinExchange() {
 BitcoinExchange::BitcoinExchange(std::string const dbfile) {
 	int res;
 	std::fstream input;
-	input.open(dbfile, std::ios::in);
+	// input.open(dbfile, std::ios::in);
+	input.open(dbfile.c_str(), std::ios::in);
 	if (!input.is_open()) {
 		std::cerr << "Error: Could not open file " << dbfile << std::endl;
 		return;
@@ -52,7 +53,8 @@ BitcoinExchange &BitcoinExchange::operator=(BitcoinExchange const &rhs) {
 void BitcoinExchange::parse(std::string const infile) {
 	int res;
 	std::fstream input;
-	input.open(infile, std::ios::in);
+	// input.open(infile, std::ios::in);
+	input.open(infile.c_str(), std::ios::in);
 	if (!input.is_open()) {
 		std::cerr << "Error: Could not open file " << infile << std::endl;
 		return;
