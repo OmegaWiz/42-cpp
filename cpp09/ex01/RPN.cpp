@@ -115,6 +115,9 @@ void RPN::_printError(int err) {
 }
 
 int RPN::_charToInt(char const c) {
+	if (isspace(c)) {
+		return SPACE;
+	}
 	if (c < '0' || c > '9') {
 		switch (c) {
 			case '+':
@@ -125,8 +128,6 @@ int RPN::_charToInt(char const c) {
 				return MULTIPLY_SIGN;
 			case '/':
 				return DIVIDE_SIGN;
-			case ' ':
-				return SPACE;
 			default:
 				return BAD_INPUT_ERR;
 		}

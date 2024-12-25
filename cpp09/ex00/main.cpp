@@ -5,7 +5,21 @@ int main(int argc, char **argv) {
 		std::cerr << "Usage: " << argv[0] << " <config_file>" << std::endl;
 		return 1;
 	}
-	BitcoinExchange btc("./cpp_09/data.csv");
-	btc.parse(argv[2]);
+	BitcoinExchange btc;
+	try {
+		btc.load_db("data.csv");
+	} catch (const std::exception &e) {
+		std::cerr << "There are some problems with the database file" << std::endl;
+		std::cerr << e.what() << std::endl;
+		return 1;
+	}
+	// std::cout << "Database loaded" << std::endl;
+	try {
+		btc.parse(argv[1]);
+	} catch (const std::exception &e) {
+		std::cerr << "There are some problems with the input file" << std::endl;
+		std::cerr << e.what() << std::endl;
+		return 1;
+	}
 	return 0;
 }

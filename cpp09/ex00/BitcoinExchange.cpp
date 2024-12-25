@@ -1,39 +1,39 @@
 #include "BitcoinExchange.hpp"
-#include <cstddef>
-#include <fstream>
-#include <iostream>
-#include <string>
 
-BitcoinExchange::BitcoinExchange() {
+bool operator<(s_tm const &lhs, s_tm const &rhs) {
+	if (lhs.tm_year < rhs.tm_year)
+		return true;
+	if (lhs.tm_year > rhs.tm_year)
+		return false;
+	if (lhs.tm_mon < rhs.tm_mon)
+		return true;
+	if (lhs.tm_mon > rhs.tm_mon)
+		return false;
+	if (lhs.tm_mday < rhs.tm_mday)
+		return true;
+	if (lhs.tm_mday > rhs.tm_mday)
+		return false;
+	if (lhs.tm_hour < rhs.tm_hour)
+		return true;
+	if (lhs.tm_hour > rhs.tm_hour)
+		return false;
+	if (lhs.tm_min < rhs.tm_min)
+		return true;
+	if (lhs.tm_min > rhs.tm_min)
+		return false;
+	if (lhs.tm_sec < rhs.tm_sec)
+		return true;
+	if (lhs.tm_sec > rhs.tm_sec)
+		return false;
+	return false;
 }
 
-BitcoinExchange::BitcoinExchange(std::string const dbfile) {
-	int res;
-	std::fstream input;
-	// input.open(dbfile, std::ios::in);
-	input.open(dbfile.c_str(), std::ios::in);
-	if (!input.is_open()) {
-		std::cerr << "Error: Could not open file " << dbfile << std::endl;
-		return;
-	}
-	std::string line;
-	while (std::getline(input, line)) {
-		std::string date, value;
-		ld price;
-		if ((res = this->_lineParser(line, date, value, ",") < 0)) {
-			this->_printError(res);
-			continue;
-		}
-		if ((res = this->_dateChecker(date)) < 0) {
-			this->_printError(res);
-			continue;
-		}
-		if ((price = this->_valueParser(value)) < 0) {
-			this->_printError(price);
-			continue;
-		}
-		this->m_db[date] = price;
-	}
+std::ostream &operator<<(std::ostream &o, s_tm const &tm) {
+	o << tm.tm_year << "-" << tm.tm_mon << "-" << tm.tm_mday;
+	return o;
+}
+
+BitcoinExchange::BitcoinExchange() {
 }
 
 BitcoinExchange::~BitcoinExchange() {
@@ -50,223 +50,199 @@ BitcoinExchange &BitcoinExchange::operator=(BitcoinExchange const &rhs) {
 	return *this;
 }
 
+void BitcoinExchange::load_db(std::string const dbfile) {
+	// int res;
+	std::fstream input;
+	input.open(dbfile.c_str(), std::ios::in);
+	if (!input.is_open()) {
+		throw FileError();
+		return;
+	}
+	std::string line;
+	int i = 0;
+	while (std::getline(input, line)) {
+		s_tm date;
+		ld value;
+		if (i == 0) {
+			if (line.compare("date,exchange_rate") != 0) {
+				std::cerr << "There are some problem with "
+						  << dbfile << std::endl
+						  << "Error: Bad Header" << std::endl;
+				return;
+			}
+			i++;
+			continue;
+		}
+		try
+		{
+			_lineParser(line, date, value, ",");
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << "There are some problem with "
+					  << dbfile << std::endl
+					  << e.what() << " at line " << i+1 << std::endl;
+			return;
+		}
+
+		m_db[date] = value;
+		i++;
+	}
+}
+
 void BitcoinExchange::parse(std::string const infile) {
-	int res;
+	// int res;
 	std::fstream input;
 	// input.open(infile, std::ios::in);
 	input.open(infile.c_str(), std::ios::in);
 	if (!input.is_open()) {
-		std::cerr << "Error: Could not open file " << infile << std::endl;
+		throw FileError();
 		return;
 	}
 	std::string line;
+	int i = 0;
 	while (std::getline(input, line)) {
-		std::string date, value;
-		ld amount;
-		if ((res = this->_lineParser(line, date, value, "|") < 0)) {
-			this->_printError(res);
+		s_tm date;
+		ld value;
+		if (i == 0) {
+			if (line.compare("date | value") != 0) {
+				std::cerr << "There are some problem with "
+						  << infile << std::endl
+						  << "Error: Bad Header" << std::endl;
+				return;
+			}
+			i++;
 			continue;
 		}
-		if ((res = this->_dateChecker(date)) < 0) {
-			this->_printError(res);
+		try
+		{
+			_lineParser(line, date, value, "|");
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << "There are some problem with "
+					  << infile << std::endl
+					  << e.what() << " at line " << i+1 << std::endl;
+			i++;
 			continue;
 		}
-		if ((amount = this->_valueParser(value)) < 0) {
-			this->_printError(amount);
-			continue;
+
+		ld final;
+		std::map<s_tm, ld>::iterator it = m_db.upper_bound(date);
+		if (it == m_db.begin()) final = 0;
+		else {
+			it--;
+			final = it->second;
 		}
-		std::cout << date << " => " << amount << " = " << this->m_db[date] * amount << std::endl;;
+		std::cout << date << " => " << value << " = " << final * value << std::endl;;
+		i++;
 	}
 }
 
-int BitcoinExchange::_lineParser(std::string const line, std::string &date, std::string &value, const char *cmp) {
+int BitcoinExchange::_lineParser(std::string const line, s_tm &date, ld &amount, const char *cmp) {
 	size_t pos;
-	int res;
-	if ((pos = line.find(cmp)) == std::string::npos)
-		return BAD_INPUT_ERR;
-	date = line.substr(0, pos-1);
-	value = line.substr(pos + 1);
-	if ((res = this->_dateChecker(date)) < 0)
-		return res;
-	if ((res = this->_valueParser(value)) < 0)
-		return res;
+	// int res;
+	std::string key, value;
+	pos = line.find(cmp);
+	if (pos == std::string::npos) {
+		throw FormatError();
+		return -1;
+	}
+	if (cmp[0] == '|')
+		key = line.substr(0, pos-1);
+	else
+		key = line.substr(0, pos);
+	if (cmp[0] == '|')
+		value = line.substr(pos + 2, line.size() - (pos + 2));
+	else
+		value = line.substr(pos + 1, line.size() - (pos + 1));
+
+	date = _dateParser(key);
+	amount = _valueParser(value);
+
 	return 0;
 }
 
-int BitcoinExchange::_dateChecker(std::string const date) {
+s_tm BitcoinExchange::_dateParser(std::string const date) {
+	s_tm res;
+	int y, m, d;
 	size_t pos;
-	int m, d, y;
-	if (date.find(" ") != std::string::npos)
-		return BAD_DATE_ERR;
 	std::string year, month, day, tmp;
-	if ((pos = date.find("-")) == std::string::npos)
-		return BAD_DATE_ERR;
+
+	pos = date.find("-");
+	if (pos == std::string::npos)
+		throw BadDateError();
 	year = date.substr(0, pos);
 	tmp = date.substr(pos + 1);
-	if ((pos = tmp.find("-")) == std::string::npos)
-		return BAD_DATE_ERR;
+	pos = tmp.find("-");
+	if (pos == std::string::npos)
+		throw BadDateError();
 	month = tmp.substr(0, pos);
 	day = tmp.substr(pos + 1);
-	if ((y = this->_strToInt(year)) < 0)
-		return y;
-	if ((m = this->_strToInt(month)) < 0)
-		return m;
+	y = _strToInt(year);
+	if (y < 0)
+		throw BadDateError();
+	if (y > 9999)
+		throw BadDateError();
+	m = _strToInt(month);
+	if (m < 0)
+		throw BadDateError();
 	if (m > 12)
-		return BAD_DATE_ERR;
-	if ((d = this->_strToInt(day)) < 0)
-		return d;
+		throw BadDateError();
+	d = _strToInt(day);
+	if (d < 0)
+		throw BadDateError();
 	if (d > 31)
-		return BAD_DATE_ERR;
+		throw BadDateError();
 	if (d == 31) {
 		if (m == 2 || m == 4 || m == 6 || m == 9 || m == 11)
-			return BAD_DATE_ERR;
+			throw BadDateError();
 	}
 	if (d == 30) {
 		if (m == 2)
-			return BAD_DATE_ERR;
+			throw BadDateError();
 	}
 	if (d == 29) {
 		if (m == 2) {
 			if ((y % 4) != 0)
-				return BAD_DATE_ERR;
+				throw BadDateError();
 			if ((y % 100) == 0 && (y % 400) != 0)
-				return BAD_DATE_ERR;
+				throw BadInputError();
 		}
 	}
-	return 0;
-}
-
-int BitcoinExchange::_dateComparator(std::string const date1, std::string const date2) {
-	int y1, m1, d1, y2, m2, d2;
-	size_t pos;
-	std::string year, month, day, tmp;
-
-	if ((pos = date1.find("-")) == std::string::npos)
-		return BAD_DATE_ERR;
-	year = date1.substr(0, pos);
-	tmp = date1.substr(pos + 1);
-	if ((pos = tmp.find("-")) == std::string::npos)
-		return BAD_DATE_ERR;
-	month = tmp.substr(0, pos);
-	day = tmp.substr(pos + 1);
-	if ((y1 = this->_strToInt(year)) < 0)
-		return y1;
-	if ((m1 = this->_strToInt(month)) < 0)
-		return m1;
-	if (m1 > 12)
-		return BAD_DATE_ERR;
-	if ((d1 = this->_strToInt(day)) < 0)
-		return d1;
-	if (d1 > 31)
-		return BAD_DATE_ERR;
-	if (d1 == 31) {
-		if (m1 == 2 || m1 == 4 || m1 == 6 || m1 == 9 || m1 == 11)
-			return BAD_DATE_ERR;
-	}
-	if (d1 == 30) {
-		if (m1 == 2)
-			return BAD_DATE_ERR;
-	}
-	if (d1 == 29) {
-		if (m1 == 2) {
-			if ((y1 % 4) != 0)
-				return BAD_DATE_ERR;
-			if ((y1 % 100) == 0 && (y1 % 400) != 0)
-				return BAD_DATE_ERR;
-		}
-	}
-
-	if ((pos = date2.find("-")) == std::string::npos)
-		return BAD_DATE_ERR;
-	year = date2.substr(0, pos);
-	tmp = date2.substr(pos + 1);
-	if ((pos = tmp.find("-")) == std::string::npos)
-		return BAD_DATE_ERR;
-	month = tmp.substr(0, pos);
-	day = tmp.substr(pos + 1);
-	if ((y2 = this->_strToInt(year)) < 0)
-		return y2;
-	if ((m2 = this->_strToInt(month)) < 0)
-		return m2;
-	if (m2 > 12)
-		return BAD_DATE_ERR;
-	if ((d2 = this->_strToInt(day)) < 0)
-		return d2;
-	if (d2 > 31)
-		return BAD_DATE_ERR;
-	if (d2 == 31) {
-		if (m2 == 2 || m2 == 4 || m2 == 6 || m2 == 9 || m2 == 11)
-			return BAD_DATE_ERR;
-	}
-	if (d2 == 30) {
-		if (m2 == 2)
-			return BAD_DATE_ERR;
-	}
-	if (d2 == 29) {
-		if (m2 == 2) {
-			if ((y2 % 4) != 0)
-				return BAD_DATE_ERR;
-			if ((y2 % 100) == 0 && (y2 % 400) != 0)
-				return BAD_DATE_ERR;
-		}
-	}
-
-	if (y1 < y2)
-		return LESS_THAN;
-	if (y1 > y2)
-		return GREATER_THAN;
-	if (m1 < m2)
-		return LESS_THAN;
-	if (m1 > m2)
-		return GREATER_THAN;
-	if (d1 < d2)
-		return LESS_THAN;
-	if (d1 > d2)
-		return GREATER_THAN;
-	return EQUAL;
+	res.tm_year = y;
+	res.tm_mon = m;
+	res.tm_mday = d;
+	res.tm_hour = 0;
+	res.tm_min = 0;
+	res.tm_sec = 0;
+	return res;
 }
 
 ld BitcoinExchange::_valueParser(std::string const value) {
 	std::string num, frac;
 	ld res, tmp;
+	size_t pos;
 
-	if (value.find(".") != std::string::npos) {
-		frac = value.substr(value.find(".") + 1);
-		num = value.substr(0, value.find("."));
+	pos = value.find(".");
+	if (pos != std::string::npos) {
+		frac = value.substr(pos + 1);
+		num = value.substr(0, pos);
 	}
 	else {
 		num = value;
 		frac = "0";
 	}
-	res = this->_strToInt(frac);
+	res = (ld) _strToInt(frac);
 	if (res < 0)
-		return res;
-	while (res > 0)
+		return -1;
+	while (res >= 1)
 		res /= 10;
-	tmp = this->_strToInt(num);
+	tmp = _strToInt(num);
 	if (tmp < 0)
-		return tmp;
+		return -1;
+	// std::cout << "DEBUG: " << tmp << " + " << res << " = " << tmp + res << std::endl;
 	return tmp + res;
-}
-
-void BitcoinExchange::_printError(int err) {
-	switch (err) {
-		case BAD_INPUT_ERR:
-			std::cerr << "Error: Bad input" << std::endl;
-			break;
-		case BAD_DATE_ERR:
-			std::cerr << "Error: Bad date" << std::endl;
-			break;
-		case LESS_THAN_ZERO_ERR:
-			std::cerr << "Error: Value less than zero" << std::endl;
-			break;
-		case OVERFLOW_ERR:
-			std::cerr << "Error: Overflow" << std::endl;
-			break;
-		default:
-			std::cerr << "Error: Unknown error: " << err << std::endl;
-			break;
-	}
 }
 
 int BitcoinExchange::_strToInt(std::string const str) {
@@ -275,16 +251,43 @@ int BitcoinExchange::_strToInt(std::string const str) {
 	size_t i = 0;
 
 	if (str[i] == '-') {
-		return LESS_THAN_ZERO_ERR;
+		throw BadValueError();
+		return -1;
 	}
-	for (; i < str.length(); i++) {
-		if (str[i] < '0' || str[i] > '9')
-			return BAD_INPUT_ERR;
-		if (res > INT_MAX / 10)
-			return OVERFLOW_ERR;
+	for (; str[i] != 0; i++) {
+		if (str[i] < '0' || str[i] > '9') {
+			throw BadValueError();
+			return -1;
+		}
+		if (res > INT_MAX / 10) {
+			throw BadValueError();
+			return -1;
+		}
 		res = res * 10 + (str[i] - '0');
-		if (res < 0)
-			return OVERFLOW_ERR;
+		if (res < 0) {
+			throw BadValueError();
+			return -1;
+		}
 	}
 	return res * sign;
+}
+
+const char *BitcoinExchange::FileError::what() const throw() {
+	return "Error: Unable to open file";
+}
+
+const char *BitcoinExchange::BadInputError::what() const throw() {
+	return "Error: Bad input";
+}
+
+const char *BitcoinExchange::BadDateError::what() const throw() {
+	return "Error: Bad date";
+}
+
+const char *BitcoinExchange::BadValueError::what() const throw() {
+	return "Error: Bad value";
+}
+
+const char *BitcoinExchange::FormatError::what() const throw() {
+	return "Error: Invalid format (expected: key <sep> value)";
 }

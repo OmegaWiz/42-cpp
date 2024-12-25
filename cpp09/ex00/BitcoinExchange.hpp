@@ -4,8 +4,11 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <cstddef>
+#include <fstream>
 
 #define ld long double
+#define s_tm struct tm
 #define BAD_INPUT_ERR -1
 #define BAD_DATE_ERR -2
 #define LESS_THAN_ZERO_ERR -3
@@ -19,20 +22,47 @@
 
 class BitcoinExchange {
 	public:
-		BitcoinExchange(std::string const dbfile="data.csv");
+		BitcoinExchange();
 		~BitcoinExchange();
 		BitcoinExchange(BitcoinExchange const &src);
 		BitcoinExchange &operator=(BitcoinExchange const &rhs);
 
+		void load_db(std::string const dbfile="data.csv");
 		void parse(std::string const infile);
-	private:
-		std::map<std::string, ld> m_db;
 
-		BitcoinExchange();
-		int _lineParser(std::string const line, std::string &date, std::string &value, const char *cmp);
-		int _dateChecker(std::string const date);
-		int _dateComparator(std::string const date1, std::string const date2);
+		class FileError : public std::exception {
+			public:
+				const char *what() const throw();
+		};
+
+		class BadInputError : public std::exception {
+			public:
+				const char *what() const throw();
+		};
+
+		class BadDateError : public std::exception {
+			public:
+				const char *what() const throw();
+		};
+
+		class BadValueError : public std::exception {
+			public:
+				const char *what() const throw();
+		};
+
+		class FormatError : public std::exception {
+			public:
+				const char *what() const throw();
+		};
+	private:
+		std::map<s_tm, ld> m_db;
+
+		int _lineParser(std::string const line, s_tm &date, ld &amount, const char *cmp);
 		ld _valueParser(std::string const value);
-		void _printError(int err=0);
+		s_tm _dateParser(std::string const date);
+		// int _dateComparator(std::string const date1, std::string const date2);
 		int _strToInt(std::string const str);
 };
+
+bool operator<(s_tm const &lhs, s_tm const &rhs) ;
+std::ostream &operator<<(std::ostream &os, s_tm const &date);
