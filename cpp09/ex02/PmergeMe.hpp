@@ -26,12 +26,14 @@ class PmergeMe {
 		PmergeMe();
 		std::deque<int> container1;
 		std::vector<int> container2;
-		std::deque<int> container3;
-		std::vector<int> container4;
+		// std::deque<int> container3;
+		// std::vector<int> container4;
 
 		void _next_Jacobstial(int j[3]);
 		int _bsearch_d(std::deque<int> &v, int n);
+		int _bsearch_d(std::deque<int> &v, int n, int l, int r);
 		int _bsearch_v(std::vector<int> &v, int n);
+		int _bsearch_v(std::vector<int> &v, int n, int l, int r);
 		void _sort_v(std::vector<int> &v);
 		void _sort_d(std::deque<int> &v);
 };
