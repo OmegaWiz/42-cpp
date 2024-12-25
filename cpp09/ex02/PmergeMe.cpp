@@ -13,6 +13,8 @@ PmergeMe::PmergeMe(char const **av) {
 				if (isdig) {
 					container1.push_back(x);
 					container2.push_back(x);
+					container3.push_back(x);
+					container4.push_back(x);
 					x = 0;
 					isdig = false;
 				}
@@ -32,6 +34,8 @@ PmergeMe::PmergeMe(char const **av) {
 		if (isdig) {
 			container1.push_back(x);
 			container2.push_back(x);
+			container3.push_back(x);
+			container4.push_back(x);
 		}
 		i++;
 	}
@@ -39,24 +43,51 @@ PmergeMe::PmergeMe(char const **av) {
 	for (int i = 0; i < (int) container1.size(); i++) {
 		std::cout << container1[i] << " ";
 	}
-	std::cout << "|" << std::endl;
+	std::cout << std::endl;
+	struct timeval d1, d2, v1, v2;
+	gettimeofday(&d1, NULL);
 	_sort_d(container1);
-	std::cout << "After sort(1):" << std::endl;
-	for (int i = 0; i < (int) container1.size(); i++) {
-		std::cout << container1[i] << " ";
-	}
-	std::cout << std::endl;
-	std::cout << "Before sort(2):" << std::endl;
-	for (int i = 0; i < (int) container2.size(); i++) {
-		std::cout << container2[i] << " ";
-	}
-	std::cout << std::endl;
+	gettimeofday(&d2, NULL);
+	// std::cout << "After sort(1):" << std::endl;
+	// for (int i = 0; i < (int) container1.size(); i++) {
+	// 	std::cout << container1[i] << " ";
+	// }
+	// std::cout << std::endl;
+	// std::cout << "Before sort(2):" << std::endl;
+	// for (int i = 0; i < (int) container2.size(); i++) {
+	// 	std::cout << container2[i] << " ";
+	// }
+	// std::cout << std::endl;
+	gettimeofday(&v1, NULL);
 	_sort_v(container2);
+	gettimeofday(&v2, NULL);
 	std::cout << "After sort(2):" << std::endl;
 	for (int i = 0; i < (int) container2.size(); i++) {
 		std::cout << container2[i] << " ";
 	}
 	std::cout << std::endl;
+	std::cout << "Time to process a range of " << container1.size()
+			  << " elements with std::deque  : "
+			  << ((d2.tv_sec - d1.tv_sec) * 1000000 + (d2.tv_usec - d1.tv_usec))
+			  << " microseconds" << std::endl;
+	std::cout << "Time to process a range of " << container2.size()
+			  << " elements with std::vector : "
+			  << ((v2.tv_sec - v1.tv_sec) * 1000000 + (v2.tv_usec - v1.tv_usec))
+			  << " microseconds" << std::endl;
+	gettimeofday(&d1, NULL);
+	std::sort(container3.begin(), container3.end());
+	gettimeofday(&d2, NULL);
+	gettimeofday(&v1, NULL);
+	std::sort(container4.begin(), container4.end());
+	gettimeofday(&v2, NULL);
+	std::cout << "Time to process a range of " << container3.size()
+			  << " elements with std::deque  : "
+			  << ((d2.tv_sec - d1.tv_sec) * 1000000 + (d2.tv_usec - d1.tv_usec))
+			  << " microseconds" << std::endl;
+	std::cout << "Time to process a range of " << container4.size()
+			  << " elements with std::vector : "
+			  << ((v2.tv_sec - v1.tv_sec) * 1000000 + (v2.tv_usec - v1.tv_usec))
+			  << " microseconds" << std::endl;
 }
 
 PmergeMe::~PmergeMe() {
@@ -135,22 +166,26 @@ void PmergeMe::_sort_d(std::deque<int> &v) {
 	}
 	_sort_d(u);
 	std::deque<int> sorted = u;
+	std::deque<int> looker(u.size(), 0);
+	for (int i = 1; i < (int) v.size(); i += 2) {
+		index = _bsearch_d(u, v[i]);
+		looker[index] = v[i-1];
+	}
 	// for (int i = 0; i < (int) sorted.size(); i++) {
 	// 	std::cout << sorted[i] << " ";
 	// }
 	// std::cout << "larger half" << std::endl;
 	index = std::find(v.begin(), v.end(), u.front()) - v.begin();
 	sorted.push_front(v[index - 1]);
+	int to_check = (int) u.size();
 
 	int jacob[3] = {1, 1, 3};
 	while (jacob[2] < (int) v.size()) {
 		for (int i = jacob[2]-1; i > jacob[1]-1; i--) {
-			if (i >= (int) u.size()) {
-				continue;
-			}
+			// if (i >= (int) u.size()) continue;
+			if (i >= to_check) continue;
 			// std::cout << "inserting b[" << i+1 << "] of " << u[i];
-			index = std::find(v.begin(), v.end(), u[i]) - v.begin();
-			int j = v[index - 1];
+			int j = looker[i];
 			// std::cout << " which is " << j << std::endl;
 			// index2 = _bsearch_d(sorted, u[i]);
 			// std::deque<int> tmp(sorted.begin(), sorted.begin() + index2);
@@ -166,9 +201,10 @@ void PmergeMe::_sort_d(std::deque<int> &v) {
 		_next_Jacobstial(jacob);
 		// std::cout << "jacob: " << jacob[0] << " " << jacob[1] << " " << jacob[2] << std::endl;
 	}
-	for (int i = 0; i < (int) sorted.size(); i++) {
-		v[i] = sorted[i];
-	}
+	// for (int i = 0; i < (int) sorted.size(); i++) {
+	// 	v[i] = sorted[i];
+	// }
+	v = sorted;
 }
 
 int PmergeMe::_bsearch_v(std::vector<int> &v, int n) {
@@ -225,22 +261,26 @@ void PmergeMe::_sort_v(std::vector<int> &v) {
 	}
 	_sort_v(u);
 	std::vector<int> sorted = u;
+	std::vector<int> looker(u.size(), 0);
+	for (int i = 1; i < (int) v.size(); i += 2) {
+		index = _bsearch_v(u, v[i]);
+		looker[index] = v[i-1];
+	}
 	// for (int i = 0; i < (int) sorted.size(); i++) {
 	// 	std::cout << sorted[i] << " ";
 	// }
 	// std::cout << "larger half" << std::endl;
 	index = std::find(v.begin(), v.end(), u.front()) - v.begin();
 	sorted.insert(sorted.begin(), v[index - 1]);
+	int to_check = (int) u.size();
 
 	int jacob[3] = {1, 1, 3};
 	while (jacob[2] < (int) v.size()) {
 		for (int i = jacob[2]-1; i > jacob[1]-1; i--) {
-			if (i >= (int) u.size()) {
-				continue;
-			}
+			// if (i >= (int) u.size()) continue;
+			if (i >= to_check) continue;
 			// std::cout << "inserting b[" << i+1 << "] of " << u[i];
-			index = std::find(v.begin(), v.end(), u[i]) - v.begin();
-			int j = v[index - 1];
+			int j = looker[i];
 			// std::cout << " which is " << j << std::endl;
 			// index2 = _bsearch_d(sorted, u[i]);
 			// std::deque<int> tmp(sorted.begin(), sorted.begin() + index2);
@@ -256,10 +296,10 @@ void PmergeMe::_sort_v(std::vector<int> &v) {
 		_next_Jacobstial(jacob);
 		// std::cout << "jacob: " << jacob[0] << " " << jacob[1] << " " << jacob[2] << std::endl;
 	}
-	for (int i = 0; i < (int) sorted.size(); i++) {
-		v[i] = sorted[i];
-	}
-
+	// for (int i = 0; i < (int) sorted.size(); i++) {
+	// 	v[i] = sorted[i];
+	// }
+	v = sorted;
 
 
 	// int index, index3;

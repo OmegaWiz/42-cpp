@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <sys/time.h>
 
 #define ld long double
 #define INDEX_ERR -1
@@ -25,6 +26,8 @@ class PmergeMe {
 		PmergeMe();
 		std::deque<int> container1;
 		std::vector<int> container2;
+		std::deque<int> container3;
+		std::vector<int> container4;
 
 		void _next_Jacobstial(int j[3]);
 		int _bsearch_d(std::deque<int> &v, int n);
